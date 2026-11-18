@@ -195,7 +195,7 @@ const UPG=[
 ];
 const GOAL={cash:600000,rating:8.5};
 
-let S=null, modalOpen=false, modalQ=[], curTab='hotel', lastSpeed=1;
+let acc=0, S=null, modalOpen=false, modalQ=[], curTab='hotel', lastSpeed=1;
 
 // ---------- calendar & market ----------
 function dateOf(day){return new Date(2026,3,1+day)}
@@ -526,7 +526,9 @@ function toast(t){const el=document.createElement('div');el.className='toast';el
 function tick(){
   if(!S||modalOpen||S.over||S.speed===0)return;
   const quiet=S.min<420||S.min>=1320;
-  const n=quiet?12:S.speed;
+  // ▶ ≈ 6 min per speeldag (7u–22u), ▶▶ ≈ 2,5 min, ⏩ ≈ 1 min
+  acc+=quiet?12:({1:.25,2:.6,4:1.5}[S.speed]||.25);
+  const n=Math.floor(acc); acc-=n;
   for(let i=0;i<n;i++){
     S.min++;
     if(S.min>=1440){audit();break;}
