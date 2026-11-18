@@ -526,8 +526,8 @@ function toast(t){const el=document.createElement('div');el.className='toast';el
 function tick(){
   if(!S||modalOpen||S.over||S.speed===0)return;
   const quiet=S.min<420||S.min>=1320;
-  // ▶ ≈ 6 min per speeldag (7u–22u), ▶▶ ≈ 2,5 min, ⏩ ≈ 1 min
-  acc+=quiet?12:({1:.25,2:.6,4:1.5}[S.speed]||.25);
+  // ▶ ≈ 15 min per speeldag (7u–22u), ▶▶ ≈ 7,5 min, ⏩ ≈ 3 min
+  acc+=quiet?12:({1:.1,2:.2,4:.5}[S.speed]||.1);
   const n=Math.floor(acc); acc-=n;
   for(let i=0;i<n;i++){
     S.min++;
