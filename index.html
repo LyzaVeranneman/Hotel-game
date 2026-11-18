@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f2f40">
+<title>Hotel Duinzicht – Kusthotel Tycoon</title>
+<style>
+:root{--sea:#1d6f8a;--navy:#0f2f40;--sand:#f6eddc;--sand2:#efe2c8;--coral:#e76f51;--green:#2a9d8f;--amber:#e9a23b;--ink:#1d2a33;--mut:#6b7a85;--card:#fffdf8;--line:#eadfca}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--sand);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
+#app{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:78px}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(160deg,var(--navy),var(--sea));color:#fff;padding:10px 12px 9px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.r1,.r2{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-weight:800;font-size:17px;letter-spacing:.2px}
+#cash{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums}
+#cash.neg{color:#ffb4a2}
+.r2{margin-top:6px;font-size:13px}
+.info{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#clock{font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:6px}
+.speed{display:flex;gap:4px}
+.speed button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:7px;padding:5px 8px;font-size:13px;min-width:34px}
+.speed button.on{background:#fff;color:var(--navy);font-weight:700}
+.dayline{height:4px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:7px;position:relative;overflow:hidden}
+.dayline i{position:absolute;top:0;bottom:0;background:rgba(255,255,255,.25)}
+.dayline b{position:absolute;top:-1px;width:3px;height:6px;background:#fff}
+main{padding:10px}
+.tab{display:none}.tab.on{display:block}
+.card{background:var(--card);border-radius:14px;padding:11px 12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(60,40,10,.08);border:1px solid var(--line)}
+.card h3{margin:0 0 7px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.card h3 small{font-weight:500;color:var(--mut);font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two .card{margin-bottom:0}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:2px 0}
+.kv span:first-child{color:var(--mut)}
+.kv b{font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;background:var(--sand2);color:var(--ink);font-weight:600}
+.chip.g{background:#d4efe9;color:#1d6b5f}.chip.r{background:#fbd9cf;color:#a5391e}.chip.b{background:#d6e8f0;color:#164e63}.chip.a{background:#fbe6c2;color:#8a5a06}
+.seats{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:8px auto;max-width:280px}
+.seat{aspect-ratio:1;border-radius:50%;background:#e8dcc3}
+.seat.on{background:var(--coral)}
+.seat.over{background:#b23a1e}
+.queue{font-size:13px;min-height:20px}
+.bars{display:flex;align-items:flex-end;gap:1px;height:46px;border-bottom:1px solid #ccc;position:relative;margin-top:6px}
+.bars i{flex:1;background:var(--sea);border-radius:2px 2px 0 0;min-height:1px}
+.bars i.hi{background:var(--coral)}
+.bars .cap{position:absolute;left:0;right:0;top:0;border-top:1px dashed var(--coral)}
+.axis{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-top:2px}
+.floor{margin-bottom:8px}
+.floor .fl{font-size:11px;color:var(--mut);margin-bottom:3px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(11,1fr);gap:3px}
+.room{aspect-ratio:1;border-radius:5px;font-size:9px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-weight:700;cursor:pointer;user-select:none}
+.room small{font-size:8px;font-weight:600;opacity:.75}
+.st-clean{background:#cfeae4;color:#24584f}
+.st-occ{background:var(--sea);color:#fff}
+.st-dirty{background:var(--amber);color:#fff}
+.st-cleaning{background:#f6d86b;color:#6b5200;animation:pulse 1s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:.55}}
+.room.dep{box-shadow:inset 0 0 0 2px var(--coral)}
+.room .dg{position:absolute;top:0;right:1px;font-size:7px}
+.room.prio::after{content:"★";position:absolute;bottom:0;right:1px;font-size:8px;color:#b00}
+.room.svc::before{content:"";position:absolute;left:2px;bottom:2px;width:4px;height:4px;border-radius:50%;background:#fff;opacity:.85}
+.legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--mut);margin-bottom:8px}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav .in{display:flex;max-width:560px;width:100%}
+nav button{flex:1;border:0;background:none;padding:8px 2px 9px;font-size:11px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button b{font-size:19px;line-height:1.1}
+nav button.on{color:var(--sea);font-weight:700}
+.list{font-size:13px}
+.li{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0e8d8;gap:6px}
+.li .nm{font-weight:600}
+.li .sub{color:var(--mut);font-size:12px}
+.stp{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0e8d8;gap:8px}
+.stp .lab{font-size:14px}
+.stp .lab small{display:block;color:var(--mut);font-size:11.5px;margin-top:1px}
+.ctl{display:flex;align-items:center;gap:6px}
+.ctl button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--sand);font-size:18px;font-weight:700;color:var(--navy)}
+.ctl b{min-width:58px;text-align:center;font-variant-numeric:tabular-nums}
+.tog{width:50px;height:28px;border-radius:14px;background:#ccc;border:0;position:relative}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on{background:var(--green)}.tog.on::after{left:25px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;font-size:14px;background:var(--sea);color:#fff}
+.btn.sec{background:var(--sand2);color:var(--ink)}
+.btn.red{background:var(--coral)}
+.btn:disabled{opacity:.45}
+.upg{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #f0e8d8}
+.upg .d{font-size:12px;color:var(--mut)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:8px}
+.kpi{background:var(--sand);border-radius:10px;padding:7px 8px}
+.kpi span{display:block;font-size:11px;color:var(--mut)}
+.kpi b{font-size:16px;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:4px 3px;text-align:right;border-bottom:1px solid #f0e8d8}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-weight:600}
+.pos{color:#1d7a50}.neg{color:#b5381b}
+#modal{position:fixed;inset:0;background:rgba(10,25,35,.55);z-index:20;display:none;align-items:center;justify-content:center;padding:16px}
+#modal.on{display:flex}
+#modal .box{background:var(--card);border-radius:16px;max-width:460px;width:100%;max-height:86vh;overflow:auto;padding:16px}
+#modal h2{margin:0 0 8px;font-size:18px}
+#modal .acts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+#modal p{margin:6px 0;font-size:14px;line-height:1.4}
+#toasts{position:fixed;top:100px;left:0;right:0;z-index:15;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.toast{background:rgba(15,47,64,.93);color:#fff;padding:8px 12px;border-radius:10px;font-size:13px;max-width:92%;animation:tin .25s}
+@keyframes tin{from{transform:translateY(-8px);opacity:0}}
+.hint{font-size:12px;color:var(--mut);margin:4px 0 0}
+.goal{height:8px;background:var(--sand2);border-radius:4px;overflow:hidden;margin:4px 0 8px}
+.goal i{display:block;height:100%;background:var(--green)}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="r1"><div class="brand">🏨 Hotel Duinzicht</div><div id="cash">€0</div></div>
+  <div class="r2">
+    <div class="info"><span id="date"></span><span id="clock">07:00</span><span id="wx"></span><span id="rating"></span></div>
+    <div class="speed">
+      <button data-s="0">⏸</button><button data-s="1">▶</button><button data-s="2">▶▶</button><button data-s="4">⏩</button>
+    </div>
+  </div>
+  <div class="dayline" id="dayline"></div>
+</header>
+<main>
+  <section class="tab on" id="t-hotel">
+    <div class="two">
+      <div class="card" id="c-rec"></div>
+      <div class="card" id="c-hk"></div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="card" id="c-bf"></div>
+    <div class="card">
+      <h3>Kamers <small>tik op een kamer</small></h3>
+      <div class="legend">
+        <span><i style="background:#cfeae4"></i>vrij &amp; proper</span>
+        <span><i style="background:var(--sea)"></i>bezet</span>
+        <span><i style="background:var(--amber)"></i>vuil</span>
+        <span><i style="background:#f6d86b"></i>poetsen</span>
+        <span><i style="box-shadow:inset 0 0 0 2px var(--coral)"></i>vertrekt vandaag</span>
+        <span>🐾 hondenkamer</span>
+      </div>
+      <div id="floors"></div>
+    </div>
+  </section>
+  <section class="tab" id="t-dag"></section>
+  <section class="tab" id="t-beheer"></section>
+  <section class="tab" id="t-upg"></section>
+  <section class="tab" id="t-rap"></section>
+</main>
+</div>
+<nav><div class="in">
+  <button data-t="hotel" class="on"><b>🏨</b>Hotel</button>
+  <button data-t="dag"><b>📋</b>Vandaag</button>
+  <button data-t="beheer"><b>⚙️</b>Beheer</button>
+  <button data-t="upg"><b>🛠️</b>Investeren</button>
+  <button data-t="rap"><b>📊</b>Rapport</button>
+</div></nav>
+<div id="modal"><div class="box" id="mbox"></div></div>
+<div id="toasts"></div>
+
+<script>
+"use strict";
+// ---------- helpers ----------
+const $=s=>document.querySelector(s);
+const R=Math.random, rnd=(a,b)=>a+R()*(b-a), ri=(a,b)=>Math.floor(rnd(a,b+1));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pick=a=>a[Math.floor(R()*a.length)];
+const pickW=(v,w)=>{let x=R(),s=0;for(let i=0;i<v.length;i++){s+=w[i];if(x<s)return v[i]}return v[v.length-1]};
+const fmtT=m=>{m=Math.floor(m);return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const eur=v=>(v<0?'-':'')+'€'+Math.round(Math.abs(v)).toLocaleString('nl-BE');
+const pct=v=>Math.round(v*100)+'%';
+const KEY='hotel_duinzicht_v1';
+
+// ---------- constants ----------
+const TYPES=['double','twin','family'];
+const RT={double:{n:'Double',k:'D',ref:120,cl:35},twin:{n:'Twin',k:'T',ref:115,cl:35},family:{n:'Familie',k:'F',ref:175,cl:50}};
+const OCC=[.38,.42,.5,.62,.72,.8,.95,.95,.75,.6,.45,.55];   // basisvraag per maand
+const PM=[.75,.75,.8,.9,1,1.1,1.3,1.3,1.0,.9,.75,.85];       // marktprijs-factor per maand
+const MAAND=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const DAG=['zo','ma','di','wo','do','vr','za'];
+const NAMES=['Peeters','Janssens','Maes','Jacobs','Mertens','Willems','Claes','Goossens','Wouters','De Smet','Dubois','Lambert','Dupont','Van den Broeck','Hermans','Smit','De Vries','Müller','Schmidt','Martin','Leroy','Vermeulen','Desmet','Coppens','Declercq','Verhoeven','Pauwels','Van Damme','Lemmens','Baert','Bakker','Wagner','Laurent','Renard','Michiels','Thys','Aerts','Cools','Vandenberghe','Devos'];
+const WAGE={rec:190,hk:160,bf:150};
+const FIXED=4200, LAUNDRY=9, BFCOST=5.5, COMM=.15, OT_MIN=.55;
+const BF_OPEN=450, BF_CLOSE=660, CHECKIN=900, CHECKOUT=720, HK_START=540, HK_END=1020, HK_OT_END=1200, SEATS=50;
+const UPG=[
+ {id:'coffee',n:'☕ Extra koffiemachines',d:'Gasten ontbijten ±20% sneller, dus minder wachtrij.',c:4000,max:1},
+ {id:'slots',n:'📱 Ontbijt-tijdslots',d:'Gasten kiezen bij check-in een tijdslot: de drukte wordt gespreid.',c:6000,max:1},
+ {id:'beds',n:'🛏️ 5 extra bijzetbedden',d:'Meer gasten kunnen een bed bijboeken.',c:1500,max:8},
+ {id:'dog',n:'🐾 10 extra hondenkamers',d:'Mand, bakjes en afwasbare vloer. Meer honden welkom.',c:8000,max:4},
+ {id:'kiosk',n:'🖥️ Self check-in kiosk',d:'Check-in duurt de helft minder lang.',c:10000,max:1},
+ {id:'mkt',n:'📣 Campagne "Weekendje zee"',d:'+10% vraag naar kamers.',c:5000,max:1},
+ {id:'reno',n:'🎨 Renovatie kamers',d:'Gasten zijn tevredener (+5 per niveau).',c:25000,max:2},
+ {id:'well',n:'🧖 Wellness & sauna',d:'+5 tevredenheid en +5% vraag.',c:40000,max:1},
+];
+const GOAL={cash:600000,rating:8.5};
+
+let S=null, modalOpen=false, modalQ=[], curTab='hotel', lastSpeed=1;
+
+// ---------- calendar & market ----------
+function dateOf(day){return new Date(2026,3,1+day)}
+function refPrice(t){const d=dateOf(S.day);const we=d.getDay()===5||d.getDay()===6;return RT[t].ref*PM[d.getMonth()]*(we?1.12:1)}
+function rating(){const r=S.reviews;return r.length?r.reduce((a,b)=>a+b,0)/r.length:7.5}
+function supF(p,ref){return clamp(Math.pow(ref/Math.max(p,1),1.5),.15,1.7)}
+const G=id=>S.guests.find(g=>g.id===id);
+const ACTIVE=['exp','lobby','q','ci','wait'];
+
+// ---------- money ----------
+function earn(cat,a){S.cash+=a;S.td.rev[cat]=(S.td.rev[cat]||0)+a}
+function spend(cat,a){S.cash-=a;S.td.cost[cat]=(S.td.cost[cat]||0)+a}
+
+// ---------- new game ----------
+function newGame(){
+  const rooms=[];
+  for(let f=1;f<=5;f++)for(let i=1;i<=22;i++){
+    const type=i<=9?'double':i<=16?'twin':'family';
+    rooms.push({id:rooms.length,nr:f*100+i,f,type,st:'clean',g:null,dog:false,prio:false,svc:false,svcBy:false,wasDog:false});
+  }
+  [0,1,2,3,9,10,11,16,17,18].forEach(i=>rooms[i].dog=true);
+  S={v:1,day:0,min:0,cash:50000,rooms,guests:[],nid:1,
+    price:{double:120,twin:115,family:175},
+    sup:{bed:25,dog:20,bf:18,late:20,early:15},
+    pol:{late:true,early:true,over:false},
+    staff:{rec:2,hk:6,bf:3},
+    beds:10,up:{},reviews:Array.from({length:40},()=>+rnd(7,8.6).toFixed(1)),
+    hist:[],q:[],rec:[],hk:[],bf:{seat:[],q:[]},bfLog:[],ev:[],td:null,wx:'⛅',wxF:1,speed:1,over:false,won:false};
+  // gasten die gisteren al incheckten
+  for(const r of rooms){ if(R()<.6){ const g=makeGuest(r.type); g.nl=ri(0,3); g.nights=g.nl+1; if(g.dog&&!r.dog){g.dog=false;g.dogRate=0} g.st='in'; g.room=r.id; r.g=g.id; r.st='occ'; S.guests.push(g);} }
+  startDay();
+  S.min=420;
+}
+
+function makeGuest(type){
+  const fam=type==='family';
+  const persons=fam?(R()<.6?4:3):2;
+  const bed=!fam&&R()<.18*supF(S.sup.bed,25);
+  const dog=R()<.13*supF(S.sup.dog,20);
+  const bfIncl=R()<.6*supF(S.sup.bf,18);
+  const nights=pickW([1,2,3,4,5],[.3,.35,.2,.1,.05]);
+  const ref=refPrice(type), rate=S.price[type];
+  let sat=rnd(72,88)+(S.up.reno||0)*5+(S.up.well?5:0);
+  sat-=Math.max(0,rate/ref-1)*40; sat+=Math.max(0,1-rate/ref)*15;
+  return {id:S.nid++,name:'Fam. '+pick(NAMES),type,persons:persons+(bed?1:0),bed,dog,bfIncl,nights,nl:nights,rate,
+    bedRate:bed?S.sup.bed:0,dogRate:dog?S.sup.dog:0,bfRate:S.sup.bf,st:'exp',sat,arr:0,room:null,co:0,
+    bfT:-1,bfDone:false,inBf:false,bfQ:false,bqs:0,qs:0,ws:0,warned:false,spot:false};
+}
+
+function arrTime(){ if(R()<.2) return ri(660,895); return Math.round(CHECKIN+Math.pow(R(),1.7)*390); }
+function bfTime(wd){
+  if(S.up.slots) return ri(BF_OPEN,630);
+  const mean=(wd===0||wd===6)?570:540;
+  const gs=(R()+R()+R()-1.5)*75;
+  return Math.round(clamp(mean+gs,BF_OPEN,640));
+}
+
+// ---------- day start ----------
+function startDay(){
+  const d=dateOf(S.day), m=d.getMonth(), wd=d.getDay();
+  S.td={rev:{},cost:{},arr:0,arrPlanned:0,dep:0,bfServed:0,bfSpot:0,bfLost:0,bfMissed:0,bfPeak:0,lostFull:0,lostDog:0,walked:0,noshow:0,early:0,late:0,otMin:0,qPeak:0,walkins:0,revs:[]};
+  S.bfLog=[];S.q=[];S.bf={seat:[],q:[]};S.rec=[];S.hk=[];
+  const r=R();
+  if(r<.2){S.wx='☀️';S.wxF=1.12}else if(r<.32){S.wx='🌧️';S.wxF=.85}else if(r<.38){S.wx='💨';S.wxF=.9}else{S.wx='⛅';S.wxF=1}
+  const inh=S.guests.filter(g=>g.st==='in');
+  const spotP=clamp(.45*Math.pow(18/Math.max(S.sup.bf,1),1.6),.05,.9);
+  for(const g of inh){
+    g.bfDone=false;g.inBf=false;g.bfQ=false;g.spot=!g.bfIncl;
+    g.bfT=(g.bfIncl||R()<spotP)?bfTime(wd):-1;
+    if(g.nl===0){
+      let co=480+Math.pow(R(),.6)*235;
+      if(R()<.22){ if(S.pol.late){co=ri(780,840);earn('fee',S.sup.late);S.td.late++;g.sat+=3;} else g.sat-=3; }
+      if(g.bfT>=0) co=Math.max(co,g.bfT+55);
+      g.co=Math.round(co);
+    }
+  }
+  for(const rm of S.rooms){rm.svc=false;rm.svcBy=false;}
+  for(const g of inh) if(g.nl>0&&g.room!=null) S.rooms[g.room].svc=true;
+  // nieuwe reservaties voor vannacht
+  const occ=clamp(OCC[m]+({5:.2,6:.25,0:-.12}[wd]||0),.05,1.1);
+  const ratingF=clamp(.55+(rating()-5)*.12,.35,1.2);
+  const mk=(S.up.mkt?1.1:1)*(S.up.well?1.05:1)*S.wxF;
+  let bedsFree=S.beds-inh.filter(g=>g.nl>0&&g.bed).length;
+  for(const t of TYPES){
+    const total=S.rooms.filter(x=>x.type===t).length;
+    const stay=inh.filter(g=>g.type===t&&g.nl>0).length;
+    const pf=clamp(Math.pow(refPrice(t)/S.price[t],1.8),.1,1.8);
+    const want=Math.round(total*occ*pf*ratingF*mk*rnd(.9,1.1));
+    let n=Math.max(0,want-stay); const cap=total-stay;
+    if(n>cap){S.td.lostFull+=n-cap;n=cap;}
+    let dogFree=S.rooms.filter(x=>x.type===t&&x.dog&&(x.g==null||(G(x.g)&&G(x.g).nl===0))).length;
+    for(let i=0;i<n;i++){
+      const g=makeGuest(t);
+      if(g.dog){ if(dogFree>0)dogFree--; else {S.td.lostDog++;continue;} }
+      if(g.bed){ if(bedsFree>0)bedsFree--; else {g.bed=false;g.persons--;g.bedRate=0;g.sat-=5;} }
+      g.arr=arrTime(); S.guests.push(g); S.td.arrPlanned++;
+    }
+  }
+  // gebeurtenissen
+  S.ev=[];
+  const nw=ri(0,2); for(let i=0;i<nw;i++) S.ev.push({t:ri(930,1260),type:'walk',done:false});
+  if(R()<.6) S.ev.push({t:ri(600,1320),type:'klacht',done:false});
+}
+
+// ---------- rooms ----------
+function findRoom(g){
+  const c=S.rooms.filter(r=>r.type===g.type&&r.st==='clean'&&r.g==null);
+  if(!c.length) return null;
+  return g.dog?(c.find(r=>r.dog)||c[0]):(c.find(r=>!r.dog)||c[0]);
+}
+function checkIn(g,r){r.g=g.id;r.st='occ';r.svc=false;g.room=r.id;g.st='in';S.td.arr++;}
+function checkOut(g){
+  const r=S.rooms[g.room];
+  r.g=null;r.st='dirty';r.wasDog=g.dog;r.svc=false;
+  g.st='gone';S.td.dep++;
+  review(g.sat);
+}
+function review(sat){const sc=+clamp(sat/10,1,10).toFixed(1);S.reviews.push(sc);if(S.reviews.length>60)S.reviews.shift();S.td.revs.push(sc);}
+function availTonight(t){
+  const total=S.rooms.filter(x=>x.type===t).length;
+  const used=S.guests.filter(g=>g.type===t&&(ACTIVE.includes(g.st)||(g.st==='in'&&g.nl>0))).length;
+  return total-used;
+}
+
+// ---------- simulation: one minute ----------
+function step(){
+  const m=S.min, td=S.td;
+  for(const e of S.ev) if(!e.done&&e.t<=m){e.done=true;fireEvent(e);}
+  // aankomsten
+  for(const g of S.guests){
+    if(g.st==='exp'&&g.arr<=m){
+      if(m<CHECKIN){g.st='lobby';}
+      else{g.st='q';g.qs=m;S.q.push(g.id);}
+    }
+    if(g.st==='lobby'){
+      if(m>=CHECKIN){g.st='q';g.qs=m;S.q.push(g.id);}
+      else if(S.pol.early){const r=findRoom(g);if(r){checkIn(g,r);earn('fee',S.sup.early);td.early++;g.sat+=3;}}
+    }
+  }
+  // gasten die op een kamer wachten
+  for(const g of S.guests){
+    if(g.st==='wait'){
+      const r=findRoom(g);
+      if(r) checkIn(g,r);
+      else{g.sat-=.4;if(!g.warned&&m-g.ws>=45){g.warned=true;toast(`😤 ${g.name} wacht al 45 min op een ${RT[g.type].n}-kamer`);}}
+    }else if(g.st==='q'&&m-g.qs>5) g.sat-=.3;
+  }
+  // receptie
+  const ct=S.up.kiosk?1.5:3;
+  while(S.rec.length<S.staff.rec)S.rec.push({g:null,l:0});
+  for(let i=0;i<S.rec.length;i++){
+    const s=S.rec[i];
+    if(s.g!=null){s.l--;if(s.l<=0){const g=G(s.g);s.g=null;if(g){const r=findRoom(g);if(r)checkIn(g,r);else{g.st='wait';g.ws=m;}}}}
+    if(s.g==null&&i<S.staff.rec&&S.q.length){const g=G(S.q.shift());if(g){g.st='ci';s.g=g.id;s.l=ct;}}
+  }
+  S.rec=S.rec.filter((s,i)=>i<S.staff.rec||s.g!=null);
+  td.qPeak=Math.max(td.qPeak,S.q.length);
+  // vertrek
+  for(const g of S.guests) if(g.st==='in'&&g.nl===0&&g.co<=m&&!g.inBf&&!g.bfQ) checkOut(g);
+  // ontbijt
+  const bf=S.bf;
+  if(m>=BF_OPEN&&m<BF_CLOSE){
+    for(const g of S.guests) if(g.st==='in'&&g.bfT>=0&&!g.bfDone&&!g.inBf&&!g.bfQ&&g.bfT<=m){g.bfQ=true;g.bqs=m;bf.q.push(g.id);}
+  }
+  bf.seat=bf.seat.filter(s=>{if(s.e<=m){const g=G(s.g);if(g){g.inBf=false;g.bfDone=true;}return false;}return true;});
+  let used=bf.seat.reduce((a,s)=>a+s.p,0);
+  if(m>=BF_OPEN&&m<BF_CLOSE){
+    const rest=[];
+    for(const id of bf.q){
+      const g=G(id); if(!g)continue;
+      if(used+g.persons<=SEATS){
+        g.bfQ=false;g.inBf=true;
+        let dur=rnd(28,45)*(S.up.coffee?.8:1); if(used>S.staff.bf*15)dur*=1.3;
+        bf.seat.push({g:g.id,p:g.persons,e:m+dur});used+=g.persons;td.bfServed+=g.persons;
+        if(g.spot){earn('bfSpot',g.persons*S.sup.bf);td.bfSpot+=g.persons;}
+        const w=m-g.bqs; if(w>8)g.sat-=(w-8)*.4; else g.sat+=1;
+      }else if(g.spot&&m-g.bqs>20){g.bfQ=false;g.bfDone=true;g.sat-=4;td.bfLost+=g.persons;}
+      else rest.push(id);
+    }
+    bf.q=rest;
+    for(const id of bf.q){const g=G(id);if(g)g.sat-=.15;}
+  }
+  if(m===BF_CLOSE&&bf.q.length){
+    for(const id of bf.q){const g=G(id);if(!g)continue;g.bfQ=false;g.bfDone=true;
+      if(g.spot){td.bfLost+=g.persons;g.sat-=4;}else{td.bfMissed+=g.persons;g.sat-=15;}}
+    toast('🍳 Ontbijtzaal dicht om 11u – er stonden nog gasten aan te schuiven!');
+    bf.q=[];
+  }
+  if(used>S.staff.bf*15) for(const s of bf.seat){const g=G(s.g);if(g)g.sat-=.15;}
+  td.bfPeak=Math.max(td.bfPeak,used);
+  if(m>=BF_OPEN&&m<=690&&m%5===0) S.bfLog.push(used);
+  // housekeeping
+  const ot=S.pol.over&&m>=HK_END&&m<HK_OT_END;
+  const work=m>=HK_START&&(m<HK_END||ot);
+  while(S.hk.length<S.staff.hk)S.hk.push({r:null,l:0,svc:false});
+  for(let i=0;i<S.hk.length;i++){
+    const h=S.hk[i];
+    if(h.r!=null){
+      h.l--; if(m>=HK_END)td.otMin++;
+      if(h.l<=0){const r=S.rooms[h.r];if(h.svc){r.svc=false;r.svcBy=false;}else{r.st='clean';r.prio=false;}h.r=null;}
+    }
+    if(h.r==null&&i<S.staff.hk&&work){const j=pickJob(m);if(j){h.r=j.r;h.l=j.l;h.svc=j.svc;}}
+  }
+  S.hk=S.hk.filter((h,i)=>i<S.staff.hk||h.r!=null);
+}
+
+function pickJob(m){
+  const need={double:0,twin:0,family:0};
+  for(const g of S.guests) if(ACTIVE.includes(g.st)) need[g.type]++;
+  for(const r of S.rooms) if(r.st==='clean'&&r.g==null) need[r.type]--;
+  const dirty=S.rooms.filter(r=>r.st==='dirty');
+  if(dirty.length){
+    dirty.sort((a,b)=>(b.prio-a.prio)||(need[b.type]-need[a.type])||(a.nr-b.nr));
+    const r=dirty[0];r.st='cleaning';
+    return {r:r.id,l:RT[r.type].cl+(r.wasDog?15:0),svc:false};
+  }
+  if(m<HK_END){
+    const s=S.rooms.find(r=>r.svc&&!r.svcBy&&r.st==='occ'&&r.g!=null&&!(G(r.g)||{}).inBf);
+    if(s){s.svcBy=true;return {r:s.id,l:15,svc:true};}
+  }
+  return null;
+}
+
+// ---------- events ----------
+function fireEvent(e){
+  const m=S.min;
+  if(e.type==='walk'){
+    const opts=TYPES.filter(t=>availTonight(t)>0);
+    if(!opts.length)return;
+    const t=pick(opts), p=S.price[t], hi=Math.round(p*1.25/5)*5, n=ri(1,2);
+    const mk=(rate)=>{const g=makeGuest(t);g.rate=rate;g.nights=n;g.nl=n;g.dog=false;g.dogRate=0;g.arr=m;g.st='q';g.qs=m;S.guests.push(g);S.q.push(g.id);S.td.arrPlanned++;S.td.walkins++;};
+    openModal({title:'🚶 Walk-in aan de balie',body:`<p>Een gezelschap komt binnen zonder reservatie en vraagt een <b>${RT[t].n}</b>-kamer voor <b>${n} nacht${n>1?'en':''}</b>.</p><p>Je hebt vannacht nog <b>${availTonight(t)}</b> ${RT[t].n}-kamer(s) vrij.</p>`,
+      buttons:[
+        {t:`Standaardprijs ${eur(p)} / nacht`,fn:()=>{mk(p);toast('✅ Walk-in geboekt');}},
+        {t:`Last-minute prijs ${eur(hi)} / nacht`,fn:()=>{if(R()<.55){mk(hi);toast('💰 Ze gaan akkoord met de hogere prijs!');}else toast('🙅 Te duur – ze lopen door naar de buren.');}},
+        {t:'Weigeren',cls:'sec',fn:()=>{}}
+      ]});
+  }else if(e.type==='klacht'){
+    const inh=S.guests.filter(g=>g.st==='in'&&g.room!=null);
+    if(!inh.length)return;
+    const g=pick(inh), r=S.rooms[g.room];
+    const why=pick(['lawaai van de buren','een lauwe douche','een doorgezakt kussen','een haar in de badkamer','een hond die blaft op de gang','de wifi die hapert']);
+    const disc=Math.round(g.rate*.2);
+    openModal({title:'😠 Klacht van kamer '+r.nr,body:`<p>${g.name} klaagt over <b>${why}</b>.</p>`,
+      buttons:[
+        {t:'Gratis drankje aan de bar (€8)',fn:()=>{spend('gebaar',8);g.sat+=8;toast('🍹 Drankje aangeboden');}},
+        {t:`20% korting op de kamer (−${eur(disc)})`,fn:()=>{spend('gebaar',disc);g.sat+=18;toast('💶 Korting gegeven – gast is tevreden');}},
+        {t:'Enkel excuses aanbieden',cls:'sec',fn:()=>{g.sat+=1;}}
+      ]});
+  }
+}
+
+// ---------- night audit ----------
+function audit(){
+  const td=S.td;
+  for(const g of S.guests){
+    if(['q','ci','wait','lobby'].includes(g.st)){g.st='gone';td.walked++;spend('doorverwijzing',150);review(20);}
+    else if(g.st==='exp'){g.st='gone';td.noshow++;earn('noshow',g.rate);}
+  }
+  let occ=0,roomRev=0;
+  for(const g of S.guests) if(g.st==='in'){
+    occ++;roomRev+=g.rate;earn('room',g.rate);
+    if(g.bed)earn('bed',g.bedRate);
+    if(g.dog)earn('dog',g.dogRate);
+    if(g.bfIncl)earn('bf',g.bfRate*g.persons);
+    if(g.room!=null&&S.rooms[g.room].svc)g.sat-=6;
+    g.nl--;
+  }
+  spend('lonen',S.staff.rec*WAGE.rec+S.staff.hk*WAGE.hk+S.staff.bf*WAGE.bf);
+  if(td.otMin)spend('overuren',td.otMin*OT_MIN);
+  spend('vaste kosten',FIXED);
+  spend('linnen & was',occ*LAUNDRY);
+  spend('ontbijt food',td.bfServed*BFCOST);
+  spend('commissie',roomRev*COMM);
+  const rev=Object.values(td.rev).reduce((a,b)=>a+b,0), cost=Object.values(td.cost).reduce((a,b)=>a+b,0);
+  const d=dateOf(S.day);
+  const h={day:S.day,ds:`${DAG[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`,m:d.getMonth(),occ:occ/110,rooms:occ,adr:occ?roomRev/occ:0,revpar:roomRev/110,rev,cost,res:rev-cost,rating:rating(),
+    dayRev:td.revs.length?td.revs.reduce((a,b)=>a+b,0)/td.revs.length:null,bfPeak:td.bfPeak,bfServed:td.bfServed,bfMissed:td.bfMissed,bfLost:td.bfLost,lostFull:td.lostFull,lostDog:td.lostDog,walked:td.walked,noshow:td.noshow,qPeak:td.qPeak,revB:{...td.rev},costB:{...td.cost},wx:S.wx};
+  S.hist.push(h); if(S.hist.length>120)S.hist.shift();
+  S.guests=S.guests.filter(g=>g.st==='in');
+  S.day++;S.min=0;
+  startDay();
+  save();
+  showReport(h);
+  if(S.cash<-30000){S.over=true;openModal({title:'📉 Ontslagen…',body:'<p>De eigenaar heeft je ontslagen: de kaspositie zakte onder −€30.000.</p><p>Tip: pas je personeel aan op het seizoen en hou je prijzen in het oog.</p>',buttons:[{t:'Opnieuw beginnen',fn:()=>{newGame();save();renderAll();}}]});}
+  else if(!S.won&&S.cash>=GOAL.cash&&rating()>=GOAL.rating){S.won=true;openModal({title:'🏆 Doel gehaald!',body:`<p>Proficiat! Je haalde ${eur(GOAL.cash)} in kas én een reviewscore van ${GOAL.rating}+. De eigenaar geeft je een bonus en een vast contract.</p><p>Je kan gewoon verder spelen.</p>`,buttons:[{t:'Verder spelen',fn:()=>{}}]});}
+}
+
+function showReport(h){
+  const rb=Object.entries(h.revB).filter(e=>e[1]).map(([k,v])=>`<div class="kv"><span>${LBL[k]||k}</span><b>${eur(v)}</b></div>`).join('');
+  const cb=Object.entries(h.costB).filter(e=>e[1]).map(([k,v])=>`<div class="kv"><span>${k}</span><b>−${eur(v)}</b></div>`).join('');
+  const notes=[];
+  if(h.walked)notes.push(`🚕 ${h.walked} gast(en) doorverwezen naar een ander hotel (geen kamer klaar)`);
+  if(h.bfMissed)notes.push(`🍳 ${h.bfMissed} personen misten hun inbegrepen ontbijt`);
+  if(h.bfLost)notes.push(`🍳 ${h.bfLost} ontbijtklanten haakten af door de wachtrij`);
+  if(h.lostFull)notes.push(`📵 ${h.lostFull} boekingsaanvragen geweigerd: volzet`);
+  if(h.lostDog)notes.push(`🐾 ${h.lostDog} gasten met hond vonden geen hondenkamer`);
+  if(h.noshow)notes.push(`👻 ${h.noshow} no-show(s) – 1e nacht aangerekend`);
+  openModal({title:`🌙 Nachtaudit – ${h.ds}`,body:`
+    <div class="kpis">
+      <div class="kpi"><span>Bezetting</span><b>${pct(h.occ)}</b></div>
+      <div class="kpi"><span>ADR</span><b>${eur(h.adr)}</b></div>
+      <div class="kpi"><span>RevPAR</span><b>${eur(h.revpar)}</b></div>
+      <div class="kpi"><span>Omzet</span><b>${eur(h.rev)}</b></div>
+      <div class="kpi"><span>Kosten</span><b>${eur(h.cost)}</b></div>
+      <div class="kpi"><span>Resultaat</span><b class="${h.res>=0?'pos':'neg'}">${eur(h.res)}</b></div>
+    </div>
+    <div class="kv"><span>Reviews vandaag</span><b>${h.dayRev!=null?h.dayRev.toFixed(1):'–'}</b></div>
+    <div class="kv"><span>Ontbijt: geserveerd / piek</span><b>${h.bfServed} / ${h.bfPeak} van 50</b></div>
+    ${notes.length?'<p style="font-size:13px">'+notes.join('<br>')+'</p>':'<p style="font-size:13px">✨ Een vlotte dag zonder problemen!</p>'}
+    <details><summary style="font-size:13px;margin-top:6px">Detail omzet &amp; kosten</summary>${rb}<hr>${cb}</details>`,
+    buttons:[{t:`Start ${DAG[dateOf(S.day).getDay()]} ${dateOf(S.day).getDate()} ${MAAND[dateOf(S.day).getMonth()]} ☀️`,fn:()=>{}}]});
+}
+const LBL={room:'Kamers',bf:'Ontbijt (in reservatie)',bfSpot:'Ontbijt (ter plaatse)',bed:'Bijzetbedden',dog:'Honden',fee:'Late check-out / vroege check-in',noshow:'No-show',walk:'Walk-in'};
+
+// ---------- modal & toast ----------
+function openModal(o){modalQ.push(o);if(!modalOpen)nextModal();}
+function nextModal(){
+  const o=modalQ.shift(); if(!o){modalOpen=false;$('#modal').classList.remove('on');return;}
+  modalOpen=true;
+  $('#mbox').innerHTML=`<h2>${o.title}</h2>${o.body||''}<div class="acts">${o.buttons.map((b,i)=>`<button class="btn ${b.cls||''}" data-i="${i}">${b.t}</button>`).join('')}</div>`;
+  $('#mbox').querySelectorAll('.acts button').forEach(el=>el.onclick=()=>{const b=o.buttons[+el.dataset.i];nextModal();b.fn&&b.fn();renderAll();});
+  $('#modal').classList.add('on');
+}
+function toast(t){const el=document.createElement('div');el.className='toast';el.textContent=t;$('#toasts').appendChild(el);setTimeout(()=>el.remove(),3600);while($('#toasts').children.length>3)$('#toasts').firstChild.remove();}
+
+// ---------- loop ----------
+function tick(){
+  if(!S||modalOpen||S.over||S.speed===0)return;
+  const quiet=S.min<420||S.min>=1320;
+  const n=quiet?12:S.speed;
+  for(let i=0;i<n;i++){
+    S.min++;
+    if(S.min>=1440){audit();break;}
+    step();
+    if(modalOpen)break;
+  }
+  renderLive();
+}
+
+// ---------- rendering ----------
+function renderTop(){
+  const d=dateOf(S.day);
+  $('#date').textContent=`${DAG[d.getDay()]} ${d.getDate()} ${MAAND[d.getMonth()]}`;
+  $('#clock').textContent=fmtT(S.min);
+  $('#wx').textContent=S.wx;
+  $('#rating').textContent='★ '+rating().toFixed(1);
+  const c=$('#cash');c.textContent=eur(S.cash);c.classList.toggle('neg',S.cash<0);
+  document.querySelectorAll('.speed button').forEach(b=>b.classList.toggle('on',+b.dataset.s===S.speed));
+  const pos=x=>(x/1440*100)+'%';
+  $('#dayline').innerHTML=`<i style="left:${pos(BF_OPEN)};width:${pos(BF_CLOSE-BF_OPEN)};background:rgba(231,111,81,.6)" title="ontbijt"></i><i style="left:${pos(CHECKIN)};width:${pos(1320-CHECKIN)};background:rgba(42,157,143,.6)"></i><b style="left:${pos(S.min)}"></b>`;
+}
+function renderHotel(){
+  const m=S.min, gs=S.guests;
+  const cnt=st=>gs.filter(g=>g.st===st).length;
+  const busy=S.rec.filter(s=>s.g!=null).length;
+  const wait=cnt('wait');
+  $('#c-rec').innerHTML=`<h3>🛎️ Receptie</h3>
+    <div class="kv"><span>Wachtrij</span><b>${S.q.length}</b></div>
+    <div class="kv"><span>Aan de balie</span><b>${busy}/${S.staff.rec}</b></div>
+    <div class="kv"><span>Wacht op kamer</span><b class="${wait?'neg':''}">${wait}</b></div>
+    <div class="kv"><span>Lobby (vroeg)</span><b>${cnt('lobby')}</b></div>
+    <div class="kv"><span>Ingecheckt</span><b>${S.td.arr}/${S.td.arrPlanned}</b></div>
+    <p class="hint">${m<CHECKIN?'Check-in vanaf 15:00':'Check-in open'}</p>`;
+  const dirty=S.rooms.filter(r=>r.st==='dirty').length, cl=S.rooms.filter(r=>r.st==='cleaning').length;
+  const free=TYPES.map(t=>RT[t].k+' '+S.rooms.filter(r=>r.type===t&&r.st==='clean'&&r.g==null).length).join(' · ');
+  const svc=S.rooms.filter(r=>r.svc).length;
+  const onShift=m>=HK_START&&(m<HK_END||(S.pol.over&&m<HK_OT_END));
+  $('#c-hk').innerHTML=`<h3>🧹 Poetsdienst</h3>
+    <div class="kv"><span>Vuile kamers</span><b class="${dirty>10?'neg':''}">${dirty}</b></div>
+    <div class="kv"><span>Bezig</span><b>${cl}/${S.staff.hk}</b></div>
+    <div class="kv"><span>Dagservice open</span><b>${svc}</b></div>
+    <div class="kv"><span>Klaar & vrij</span><b style="font-size:12px">${free}</b></div>
+    <p class="hint">${onShift?'Dienst bezig (9u–17u'+(S.pol.over?', overuren tot 20u':'')+')':'Dienst: 9u–17u'}</p>`;
+  const used=S.bf.seat.reduce((a,s)=>a+s.p,0);
+  const qp=S.bf.q.reduce((a,id)=>a+((G(id)||{}).persons||0),0);
+  const open=m>=BF_OPEN&&m<BF_CLOSE;
+  const staffCap=S.staff.bf*15;
+  let seats='';for(let i=0;i<SEATS;i++)seats+=`<div class="seat ${i<used?(i>=staffCap?'over':'on'):''}"></div>`;
+  const bars=S.bfLog.map(v=>`<i class="${v>=45?'hi':''}" style="height:${v/50*100}%"></i>`).join('')+'<i style="height:0"></i>'.repeat(Math.max(0,49-S.bfLog.length));
+  $('#c-bf').innerHTML=`<h3>🍳 Ontbijtzaal <small>${open?'<span class="chip g">open</span>':'<span class="chip">gesloten</span>'} 07:30–11:00</small></h3>
+    <div class="kv"><span>Bezet</span><b>${used} / ${SEATS} plaatsen</b></div>
+    <div class="seats">${seats}</div>
+    <div class="queue">${qp?`⏳ Wachtrij: <b>${qp}</b> personen `+'🧍'.repeat(Math.min(12,S.bf.q.length)):'Geen wachtrij'}</div>
+    <div class="kv"><span>Geserveerd vandaag (ter plaatse geboekt)</span><b>${S.td.bfServed} (${S.td.bfSpot})</b></div>
+    ${used>staffCap?`<p class="hint" style="color:#b5381b">Te weinig ontbijtpersoneel: ${S.staff.bf} medewerkers kunnen ${staffCap} gasten vlot bedienen.</p>`:''}
+    <div class="bars"><div class="cap"></div>${bars}</div><div class="axis"><span>7:30</span><span>9:00</span><span>10:30</span><span>11:30</span></div>`;
+  renderFloors();
+}
+function buildFloors(){
+  let h='';
+  for(let f=5;f>=1;f--){
+    h+=`<div class="floor"><div class="fl">Verdieping ${f}${f===1?' · gelijkvloers: receptie & ontbijtzaal met zeezicht 🌊':''}</div><div class="grid">`;
+    for(const r of S.rooms.filter(x=>x.f===f)) h+=`<div class="room" id="rm${r.id}" data-r="${r.id}"></div>`;
+    h+='</div></div>';
+  }
+  $('#floors').innerHTML=h;
+  $('#floors').onclick=e=>{const el=e.target.closest('.room');if(el)roomModal(+el.dataset.r);};
+}
+function renderFloors(){
+  for(const r of S.rooms){
+    const el=document.getElementById('rm'+r.id); if(!el)continue;
+    const g=r.g!=null?G(r.g):null;
+    const cls='room st-'+r.st+(g&&g.nl===0?' dep':'')+(r.prio?' prio':'')+(r.svc?' svc':'');
+    if(el.className!==cls)el.className=cls;
+    const html=`${r.nr}<small>${RT[r.type].k}</small>${r.dog?'<span class="dg">🐾</span>':''}`;
+    if(el.innerHTML!==html)el.innerHTML=html;
+  }
+}
+function roomModal(id){
+  const r=S.rooms[id], g=r.g!=null?G(r.g):null;
+  const stt={clean:'Vrij en proper',occ:'Bezet',dirty:'Vuil – moet gepoetst worden',cleaning:'Wordt gepoetst'}[r.st];
+  let body=`<p><b>${RT[r.type].n}</b>${r.dog?' · 🐾 hondenkamer':''} · ${stt}</p>`;
+  if(g){
+    body+=`<p>${g.name} · ${g.persons} pers.${g.bed?' (incl. bijzetbed)':''}${g.dog?' · 🐕 met hond':''}<br>
+      Prijs ${eur(g.rate)}/nacht · ontbijt ${g.bfIncl?'inbegrepen':'niet geboekt'}<br>
+      ${g.nl===0?`Vertrekt vandaag om ±${fmtT(g.co)}`:`Blijft nog ${g.nl} nacht(en)`}<br>
+      Tevredenheid: <b>${Math.round(clamp(g.sat,0,100))}</b>/100</p>`;
+  }
+  const btns=[];
+  if(r.st==='dirty')btns.push({t:r.prio?'Prioriteit weghalen':'⭐ Eerst poetsen',fn:()=>{r.prio=!r.prio;}});
+  btns.push({t:'Sluiten',cls:'sec',fn:()=>{}});
+  openModal({title:'Kamer '+r.nr,body,buttons:btns});
+}
+function renderDag(){
+  const gs=S.guests, m=S.min;
+  const stLbl={exp:'<span class="chip">verwacht</span>',lobby:'<span class="chip a">lobby</span>',q:'<span class="chip a">wachtrij</span>',ci:'<span class="chip b">check-in</span>',wait:'<span class="chip r">wacht op kamer</span>',in:'<span class="chip g">ingecheckt</span>',gone:'<span class="chip">vertrokken</span>'};
+  const ic=g=>`${g.bed?' 🛏️':''}${g.dog?' 🐕':''}${g.bfIncl?' 🍳':''}`;
+  const arr=gs.filter(g=>g.arr>0&&(ACTIVE.includes(g.st)||(g.st==='in'&&g.nl===g.nights))).sort((a,b)=>a.arr-b.arr);
+  const dep=gs.filter(g=>g.nl===0&&(g.st==='in'||g.st==='gone')&&g.co>0).sort((a,b)=>a.co-b.co);
+  const inh=gs.filter(g=>g.st==='in');
+  const persons=inh.reduce((a,g)=>a+g.persons,0);
+  const d=dateOf(S.day);
+  $('#t-dag').innerHTML=`
+  <div class="card"><h3>Overzicht ${DAG[d.getDay()]} ${d.getDate()} ${MAAND[d.getMonth()]} <small>${S.wx}</small></h3>
+    <div class="kpis">
+      <div class="kpi"><span>Aankomsten</span><b>${S.td.arr}/${S.td.arrPlanned}</b></div>
+      <div class="kpi"><span>Vertrekken</span><b>${S.td.dep}</b></div>
+      <div class="kpi"><span>Gasten in huis</span><b>${persons}</b></div>
+    </div>
+    <div class="kv"><span>Kamers bezet vannacht (verwacht)</span><b>${110-TYPES.reduce((a,t)=>a+availTonight(t),0)} / 110</b></div>
+    <div class="kv"><span>Gemiste aanvragen (volzet / geen hondenkamer)</span><b>${S.td.lostFull} / ${S.td.lostDog}</b></div>
+    <p class="hint">Check-out tot 12:00 · check-in vanaf 15:00 · ontbijt 7:30–11:00 (max. 50 plaatsen)</p>
+  </div>
+  <div class="card"><h3>🧳 Aankomsten <small>🛏️ bijzetbed · 🐕 hond · 🍳 ontbijt</small></h3><div class="list">
+    ${arr.map(g=>`<div class="li"><div><div class="nm">${g.name}${ic(g)}</div><div class="sub">${RT[g.type].n} · ${g.persons}p · ${g.nights}n · ${eur(g.rate)}</div></div><div style="text-align:right"><div class="sub">${fmtT(g.arr)}</div>${stLbl[g.st]}</div></div>`).join('')||'<p class="hint">Geen aankomsten</p>'}
+  </div></div>
+  <div class="card"><h3>👋 Vertrekken</h3><div class="list">
+    ${dep.map(g=>`<div class="li"><div><div class="nm">${g.name}${ic(g)}</div><div class="sub">Kamer ${g.room!=null?S.rooms[g.room].nr:''} · ${RT[g.type].n}${g.co>CHECKOUT?' · late check-out':''}</div></div><div style="text-align:right"><div class="sub">±${fmtT(g.co)}</div>${g.st==='gone'?stLbl.gone:'<span class="chip b">in huis</span>'}</div></div>`).join('')||'<p class="hint">Geen vertrekken</p>'}
+  </div></div>`;
+}
+function stepper(label,hint,path,val,fmt){
+  return `<div class="stp"><div class="lab">${label}${hint?`<small>${hint}</small>`:''}</div><div class="ctl"><button data-a="${path}" data-d="-1">−</button><b>${fmt(val)}</b><button data-a="${path}" data-d="1">+</button></div></div>`;
+}
+function toggle(label,hint,key){return `<div class="stp"><div class="lab">${label}<small>${hint}</small></div><button class="tog ${S.pol[key]?'on':''}" data-p="${key}"></button></div>`;}
+const STEP={'price.double':[5,40,400],'price.twin':[5,40,400],'price.family':[5,60,500],'sup.bed':[5,0,100],'sup.dog':[5,0,100],'sup.bf':[1,5,50],'sup.late':[5,0,80],'sup.early':[5,0,80],'staff.rec':[1,1,6],'staff.hk':[1,0,20],'staff.bf':[1,1,8]};
+function renderBeheer(){
+  const sp=TYPES.map(t=>stepper(`${RT[t].n}-kamer`,`marktprijs vannacht ±${eur(refPrice(t))} · ${S.rooms.filter(r=>r.type===t).length} kamers · ${t==='family'?'4 pers.':'2 pers. (+1 bijzetbed)'}`,'price.'+t,S.price[t],eur)).join('');
+  const wages=S.staff.rec*WAGE.rec+S.staff.hk*WAGE.hk+S.staff.bf*WAGE.bf;
+  $('#t-beheer').innerHTML=`
+  <div class="card"><h3>💶 Kamerprijzen <small>per nacht</small></h3>${sp}
+    <p class="hint">Hogere prijs = minder boekingen maar meer per kamer. Weekends en zomer = hogere marktprijs. Nieuwe prijzen gelden voor nieuwe boekingen.</p></div>
+  <div class="card"><h3>➕ Meerprijzen</h3>
+    ${stepper('Bijzetbed','per nacht · voorraad: '+S.beds+' bedden','sup.bed',S.sup.bed,eur)}
+    ${stepper('Hond','per nacht · '+S.rooms.filter(r=>r.dog).length+' hondenkamers','sup.dog',S.sup.dog,eur)}
+    ${stepper('Ontbijt','per persoon · in reservatie of ter plaatse','sup.bf',S.sup.bf,eur)}
+    ${stepper('Late check-out (tot 14u)','eenmalig','sup.late',S.sup.late,eur)}
+    ${stepper('Vroege check-in (vóór 15u)','eenmalig, enkel als er een propere kamer is','sup.early',S.sup.early,eur)}
+  </div>
+  <div class="card"><h3>📜 Huisregels</h3>
+    ${toggle('Late check-out toestaan','Gasten blijven tot 14u – minder tijd om te poetsen!','late')}
+    ${toggle('Vroege check-in toestaan','Vroege gasten krijgen meteen een propere kamer','early')}
+    ${toggle('Overuren poetsdienst','Poetsen tot 20u als er nog vuile kamers zijn (€33/u)','over')}
+  </div>
+  <div class="card"><h3>👥 Personeel <small>loonkost ${eur(wages)}/dag</small></h3>
+    ${stepper('Receptionisten',eur(WAGE.rec)+'/dag · check-in duurt '+(S.up.kiosk?'1,5':'3')+' min','staff.rec',S.staff.rec,v=>v)}
+    ${stepper('Poetsdienst',eur(WAGE.hk)+'/dag · kamer 35 min, familie 50 min, +15 na hond','staff.hk',S.staff.hk,v=>v)}
+    ${stepper('Ontbijtpersoneel',eur(WAGE.bf)+'/dag · 1 medewerker per 15 gasten','staff.bf',S.staff.bf,v=>v)}
+  </div>
+  <div class="card"><h3>🎯 Doel van de eigenaar</h3>
+    <div class="kv"><span>Kaspositie ${eur(S.cash)} / ${eur(GOAL.cash)}</span></div><div class="goal"><i style="width:${clamp(S.cash/GOAL.cash*100,0,100)}%"></i></div>
+    <div class="kv"><span>Reviewscore ${rating().toFixed(1)} / ${GOAL.rating}</span></div><div class="goal"><i style="width:${clamp(rating()/GOAL.rating*100,0,100)}%"></i></div>
+    <p class="hint">Zakt je kas onder −€30.000, dan word je ontslagen.</p>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn sec" id="help">❓ Spelregels</button><button class="btn red" id="reset">Nieuw spel</button></div>
+  </div>`;
+  $('#t-beheer').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
+    const [o,k]=b.dataset.a.split('.'), [st,mn,mx]=STEP[b.dataset.a];
+    S[o][k]=clamp(S[o][k]+st*(+b.dataset.d),mn,mx); renderBeheer(); save();
+  });
+  $('#t-beheer').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.pol[b.dataset.p]=!S.pol[b.dataset.p];renderBeheer();save();});
+  $('#help').onclick=intro;
+  $('#reset').onclick=()=>openModal({title:'Nieuw spel?',body:'<p>Je huidige hotel gaat verloren.</p>',buttons:[{t:'Ja, opnieuw beginnen',cls:'red',fn:()=>{newGame();save();buildFloors();renderAll();}},{t:'Annuleren',cls:'sec',fn:()=>{}}]});
+}
+function renderUpg(){
+  $('#t-upg').innerHTML=`<div class="card"><h3>🛠️ Investeringen <small>kas: ${eur(S.cash)}</small></h3>
+    ${UPG.map(u=>{const lv=S.up[u.id]||0,full=lv>=u.max;return `<div class="upg"><div><div class="nm"><b>${u.n}</b>${u.max>1?` <span class="chip">${lv}/${u.max}</span>`:''}</div><div class="d">${u.d}</div></div>
+      <button class="btn" data-u="${u.id}" ${full||S.cash<u.c?'disabled':''}>${full?'✓':eur(u.c)}</button></div>`}).join('')}
+    <p class="hint">De ontbijtzaal blijft altijd maximaal 50 plaatsen – slim spreiden is de sleutel!</p></div>`;
+  $('#t-upg').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>buy(b.dataset.u));
+}
+function buy(id){
+  const u=UPG.find(x=>x.id===id), lv=S.up[id]||0;
+  if(lv>=u.max||S.cash<u.c)return;
+  S.cash-=u.c; S.up[id]=lv+1;
+  if(id==='beds')S.beds+=5;
+  if(id==='dog'){const c=S.rooms.filter(r=>!r.dog).slice(0,10);c.forEach(r=>r.dog=true);}
+  toast('✅ '+u.n.replace(/^\S+\s/,'')+' gekocht');
+  save();renderAll();
+}
+function renderRap(){
+  const H=S.hist;
+  if(!H.length){$('#t-rap').innerHTML='<div class="card"><h3>📊 Rapport</h3><p class="hint">Na de eerste nachtaudit (middernacht) verschijnen hier je cijfers.</p></div>';return;}
+  const last=H[H.length-1], cm=last.m, mon=H.filter(h=>h.m===cm&&h.day>S.day-32);
+  const sum=k=>mon.reduce((a,h)=>a+h[k],0);
+  const rooms=sum('rooms'), roomRev=mon.reduce((a,h)=>a+(h.revB.room||0),0);
+  const rows=H.slice(-14).reverse().map(h=>`<tr><td>${h.wx} ${h.ds}</td><td>${pct(h.occ)}</td><td>${eur(h.adr)}</td><td>${eur(h.rev)}</td><td class="${h.res>=0?'pos':'neg'}">${eur(h.res)}</td><td>${h.dayRev!=null?h.dayRev.toFixed(1):'–'}</td></tr>`).join('');
+  $('#t-rap').innerHTML=`
+  <div class="card"><h3>📅 ${MAAND[cm]} tot nu <small>${mon.length} dagen</small></h3>
+    <div class="kpis">
+      <div class="kpi"><span>Bezetting</span><b>${pct(rooms/(110*mon.length))}</b></div>
+      <div class="kpi"><span>ADR</span><b>${eur(rooms?roomRev/rooms:0)}</b></div>
+      <div class="kpi"><span>RevPAR</span><b>${eur(roomRev/(110*mon.length))}</b></div>
+      <div class="kpi"><span>Omzet</span><b>${eur(sum('rev'))}</b></div>
+      <div class="kpi"><span>Kosten</span><b>${eur(sum('cost'))}</b></div>
+      <div class="kpi"><span>Resultaat</span><b class="${sum('res')>=0?'pos':'neg'}">${eur(sum('res'))}</b></div>
+    </div>
+    <div class="kv"><span>Doorverwezen gasten</span><b>${sum('walked')}</b></div>
+    <div class="kv"><span>Gemist ontbijt (inbegrepen)</span><b>${sum('bfMissed')}</b></div>
+    <div class="kv"><span>Geweigerd: volzet / geen hondenkamer</span><b>${sum('lostFull')} / ${sum('lostDog')}</b></div>
+  </div>
+  <div class="card"><h3>Laatste 14 dagen</h3>
+    <table><tr><th>Dag</th><th>Bez.</th><th>ADR</th><th>Omzet</th><th>Result.</th><th>★</th></tr>${rows}</table>
+    <button class="btn sec" style="margin-top:10px" id="lastrep">Laatste nachtaudit openen</button>
+  </div>`;
+  $('#lastrep').onclick=()=>showReport(last);
+}
+function renderLive(){renderTop();if(curTab==='hotel')renderHotel();else if(curTab==='dag')renderDag();}
+function renderAll(){renderTop();renderHotel();renderDag();renderBeheer();renderUpg();renderRap();}
+
+function intro(){
+  openModal({title:'🏨 Welkom, General Manager!',body:`
+  <p>Je leidt <b>Hotel Duinzicht</b> aan de Belgische kust: <b>110 kamers</b> – 45 Double, 35 Twin en 30 familiekamers voor 4 personen.</p>
+  <p>🛏️ In Double- en Twinkamers kan een <b>bijzetbed</b> tegen meerprijs. 🐕 <b>Honden</b> zijn welkom in de hondenkamers, ook tegen meerprijs.</p>
+  <p>🍳 <b>Ontbijt</b> van 7:30 tot 11:00 in een zaal met <b>maximaal 50 plaatsen</b>. Gasten boeken het in hun reservatie of beslissen ter plaatse.</p>
+  <p>🕛 Check-out tot <b>12:00</b>, check-in vanaf <b>15:00</b>. Daartussen moet je poetsdienst alle vertrokken kamers klaarmaken!</p>
+  <p>⚙️ Stel prijzen, huisregels en personeel in via <b>Beheer</b>. Elke nacht krijg je het <b>dagrapport</b> met bezetting, ADR, RevPAR en resultaat.</p>
+  <p>🎯 Doel: ${eur(GOAL.cash)} in kas en een reviewscore van ${GOAL.rating}. Let op het seizoen: zomer = druk, winter = rustig.</p>`,
+  buttons:[{t:"Let's go! 🌊",fn:()=>{}}]});
+}
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(o&&o.v===1)return o;}}catch(e){}return null;}
+
+// ---------- init ----------
+document.querySelectorAll('.speed button').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.s;renderTop();});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  curTab=b.dataset.t;
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.id==='t-'+curTab));
+  if(curTab==='beheer')renderBeheer();if(curTab==='upg')renderUpg();if(curTab==='rap')renderRap();if(curTab==='dag')renderDag();if(curTab==='hotel')renderHotel();
+  window.scrollTo(0,0);
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+S=load();
+const fresh=!S;
+if(fresh)newGame();
+buildFloors();renderAll();
+if(fresh)intro();
+setInterval(tick,100);
+</script>
+</body>
+</html>
